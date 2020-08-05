@@ -1,0 +1,15 @@
+server:
+  port: 8189
+  servlet:
+    context-path: /rest_service
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
+    driverClassName: org.h2.Driver
+    username: mz
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  jackson:
+    serialization:
+      indent_output: true
