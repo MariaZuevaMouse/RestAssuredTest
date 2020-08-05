@@ -9,9 +9,17 @@ import javax.persistence.*;
 @Table(name = "items")
 @Data
 public class Item {
+    private static Long nextId;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String title;
+
+    public Item() {
+
+    }
+
 
     public Long getId() {
         return id;
@@ -25,7 +33,6 @@ public class Item {
         this.title = title;
     }
 
-    private String title;
 
     @ManyToOne
     @JoinColumn(name = "client_id")

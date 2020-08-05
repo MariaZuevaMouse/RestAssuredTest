@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class MathController {
     @GetMapping("/sum")
     public String getSum(@RequestParam Integer a, @RequestParam Integer b){
+        System.out.println(a+b);
         return String.valueOf(a+b);
+    }
+    @GetMapping("/multiply")
+    public String getMultiply(@RequestParam Integer a, @RequestParam Integer b){
+        return  String.valueOf(a*b);
     }
 }
