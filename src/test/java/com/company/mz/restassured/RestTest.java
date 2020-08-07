@@ -1,18 +1,28 @@
 package com.company.mz.restassured;
 
 import com.company.mz.restassured.entities.Item;
+import com.company.mz.restassured.repositories.ItemRepository;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 
 public class RestTest {
+    @Autowired
+    private ItemRepository itemRepository;
 
     @Test
     public void checkItemTitle(){
@@ -30,7 +40,7 @@ public class RestTest {
                 .then()
                 .statusCode(200);
     }
-//change
+
     @Test
     public void testWithParams(){
         given()
@@ -43,7 +53,7 @@ public class RestTest {
     }
 
     @Test
-    public void testWhithPathParam(){
+    public void testWithPathParam(){
         given()
                 .pathParam("id", 1)
                 .when()
@@ -103,9 +113,69 @@ public class RestTest {
                 .extract().response().body().print();
     }
 
+    @Test
+    public void testWithParamsMath() {
+        String mathResult = given()
+                .param("a", "39")
+                .param("b", "3")
+                .spec(baseSpec)
+                .when()
+                .get("/math")
+                .then()
+                .extract().response().body().asString();
 
+        Assertions.assertEquals("42", mathResult);
+    }
 
+    @ParameterizedTest
+    @DisplayName("check MathController")
+    @MethodSource("mathNumber")
+    public void checkSum( int a, int b){
+        given()
+                .spec(baseSpec)
+                .param("a", a)
+                .param("b", b)
+                .get("/math/sum/")
+                .then()
+                .extract().response().body().equals(a+b);
+    }
 
+    @ParameterizedTest
+    @DisplayName("check MathController")
+    @MethodSource("mathNumber")
+    public void checkMultiply( int a, int b){
+        given()
+                .spec(baseSpec)
+                .param("a", a)
+                .param("b", b)
+                .get("/math/multiply/")
+                .then()
+//                .extract().response().body().print();
+                .extract().response().body().equals(a*b);
+    }
 
+    public static Stream<Integer[]> mathNumber(){
+        return Stream.of(
+                new Integer[]{1, 2},
+                new Integer[]{6, 5},
+                new Integer[]{100,200},
+                new Integer[]{1000, 1},
+                new Integer[]{500, 3}
+                );
+    }
 
+    @Test
+    public void checkPutItemRequest(){
+        Item item = new Item();
+        item.setTitle("Crime plan");
+
+        given()
+                .spec(baseSpec)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body(item)
+                .put("/items")
+                .then()
+                .statusCode(500);
+    }
 }
